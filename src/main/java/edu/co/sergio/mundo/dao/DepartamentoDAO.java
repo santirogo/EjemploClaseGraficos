@@ -32,6 +32,107 @@ public class DepartamentoDAO implements IBaseDatos<Departamento> {
 	 * Funcion que permite obtener una lista de los departamentos existentes en la base de datos
 	 * @return List<Departamento> Retorna la lista de Departamentos existentes en la base de datos
 	 */
+    
+        public ArrayList recursosPorProyecto(){
+            ArrayList registros = null;
+            String query = "SELECT nom_proy, count(*) as total FROM Proyecto LEFT JOIN Recurso using (id_proyecto) group by nom_proy";
+            
+            Connection connection = null;
+            try {
+                connection = Conexion.getConnection();
+            } catch (URISyntaxException ex) {
+                Logger.getLogger(DepartamentoDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            Statement st;
+            try {
+                st = connection.createStatement();
+                ResultSet rs = st.executeQuery(query);
+                while (rs.next()){
+	    	if(registros == null){
+	    		registros= new ArrayList<Departamento>();
+	    	}
+	      
+                String nombreProyecto = rs.getString("nom_proy");
+                registros.add(nombreProyecto);
+                int contador = rs.getInt("total");
+                registros.add(contador);
+	    }
+	    st.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(DepartamentoDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            return registros;
+        }
+        
+        public ArrayList departamentosConProyectos(){
+            ArrayList registros = null;
+            
+            String query = "SELECT nom_depto, count(*) as num FROM (Depto JOIN DeptoProyecto using (id_depto)) JOIN Proyecto using (id_proyecto) group by nom_depto";
+            
+            Connection connection = null;
+            try {
+                connection = Conexion.getConnection();
+            } catch (URISyntaxException ex) {
+                Logger.getLogger(DepartamentoDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            Statement st;
+            try {
+                st = connection.createStatement();
+                ResultSet rs = st.executeQuery(query);
+                while (rs.next()){
+	    	if(registros == null){
+	    		registros= new ArrayList<Departamento>();
+	    	}
+	      
+                String nombreDepartamento = rs.getString("nom_depto");
+                registros.add(nombreDepartamento);
+                int contador = rs.getInt("num");
+                registros.add(contador);
+	    }
+	    st.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(DepartamentoDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            return registros;
+        }
+        
+        public ArrayList VariosEmpleadosConElMismoContrato(){
+            ArrayList registros = null;
+            
+            String query = "SELECT nom_depto, tipo_contrato, count(*) as total FROM Depto JOIN Empleado using (id_depto) group by nom_depto, tipo_contrato having count(*)  > 1";
+            
+            Connection connection = null;
+            try {
+                connection = Conexion.getConnection();
+            } catch (URISyntaxException ex) {
+                Logger.getLogger(DepartamentoDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            Statement st;
+            try {
+                st = connection.createStatement();
+                ResultSet rs = st.executeQuery(query);
+                while (rs.next()){
+	    	if(registros == null){
+	    		registros= new ArrayList<Departamento>();
+	    	}
+	      
+                String nombreDepartamento = rs.getString("nom_depto");
+                registros.add(nombreDepartamento);
+                String tipoContrato = rs.getString("tipo_contrato");
+                registros.add(tipoContrato);
+                int contador = rs.getInt("total");
+                registros.add(contador);
+	    }
+	    st.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(DepartamentoDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            return registros;
+        }
+    
 	public List<Departamento> findAll() {
 		List<Departamento> departamentos= null;
 	    String query = "SELECT * FROM Depto";
